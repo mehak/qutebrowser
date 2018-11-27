@@ -18,8 +18,20 @@ tmpfile = os.path.join(
                    os.path.expanduser('~/.local/share/qutebrowser')),
     'userscripts/readability.html')
 
+cssfile = os.path.join(
+    os.environ.get('QUTE_CONFIG_DIR',
+                   os.path.expanduser('~/.config/qutebrowser/')),
+    'userscripts/style.css')
+
+
 if not os.path.exists(os.path.dirname(tmpfile)):
     os.makedirs(os.path.dirname(tmpfile))
+
+style = ''
+if os.path.isfile(cssfile):
+    with open(cssfile) as cssSource:
+        css = cssSource.read()
+        style = f'<style>{css}</style>'
 
 with codecs.open(os.environ['QUTE_HTML'], 'r', 'utf-8') as source:
     data = source.read()
@@ -35,6 +47,7 @@ with codecs.open(os.environ['QUTE_HTML'], 'r', 'utf-8') as source:
 
     with codecs.open(tmpfile, 'w', 'utf-8') as target:
         target.write('<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />')
+        target.write(style)
         target.write(content)
 
     with open(os.environ['QUTE_FIFO'], 'w') as fifo:
